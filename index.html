@@ -8,7 +8,6 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#121212;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif}
 a{color:inherit;text-decoration:none}
-
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .modal-overlay.hidden{display:none}
 .modal{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:28px;width:100%;max-width:360px}
@@ -25,7 +24,6 @@ a{color:inherit;text-decoration:none}
 .modal-btn:hover{background:#333}
 .modal-err{font-size:.78rem;color:#f87171;margin-top:8px;display:none}
 .modal-err.show{display:block}
-
 nav{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid #2a2a2a;background:#121212;position:sticky;top:0;z-index:100}
 .nav-logo{font-size:1rem;font-weight:600;color:#fff}
 .nav-links{display:flex;gap:16px;align-items:center}
@@ -36,7 +34,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .owner-badge{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:3px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
 .nav-logout{font-size:.75rem;color:#555;cursor:pointer;border:1px solid #2a2a2a;padding:3px 9px;border-radius:5px;background:transparent;transition:all .15s}
 .nav-logout:hover{color:#aaa;border-color:#444}
-
 .hero{padding:40px 28px 28px;max-width:680px}
 .hero h1{font-size:1.9rem;font-weight:600;color:#fff;line-height:1.25;margin-bottom:10px}
 .hero p{font-size:.925rem;color:#888;line-height:1.7}
@@ -63,7 +60,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .tag-script{background:#221a2a;color:#a78bfa;border:1px solid #321f3d}
 .card-uploader{display:flex;align-items:center;gap:5px;margin-left:auto;font-size:.72rem}
 .card-uploader .u-name{color:#888}
-.card-uploader .owner-badge{font-size:.55rem;padding:1px 5px}
 .card-title{font-size:.95rem;font-weight:600;color:#fff;margin-bottom:5px}
 .card-desc{font-size:.82rem;color:#777;line-height:1.6;flex:1}
 .card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid #242424}
@@ -102,6 +98,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .size-note{font-size:.75rem;color:#555;margin-top:6px;line-height:1.5}
 .login-prompt{font-size:.82rem;color:#555;padding:12px 14px;background:#161616;border:1px solid #222;border-radius:7px;margin-bottom:14px}
 .login-prompt a{color:#60a5fa;cursor:pointer}
+.setup-banner{background:#1a1f2a;border:1px solid #1f2d3d;border-radius:8px;padding:14px 18px;margin:16px 28px;font-size:.82rem;color:#60a5fa;line-height:1.8}
+.setup-banner strong{color:#93c5fd}
+.setup-banner code{background:#121212;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:.8rem;color:#c084fc}
 footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;font-size:.82rem;margin-top:8px}
 </style>
 </head>
@@ -147,7 +146,14 @@ footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;fo
 
 <div class="hero">
   <h1>Glitch Viruses</h1>
-  <p>A collection of tools, executables, games, and scripts. Upload your own — everything is stored locally in your browser.</p>
+  <p>A collection of tools, executables, games, and scripts. Upload your own — projects are shared with everyone.</p>
+</div>
+
+<div id="setup-banner" class="setup-banner" style="display:none">
+  ⚠️ <strong>JSONBin not configured yet — projects are only visible to you.</strong><br>
+  <strong>1)</strong> Sign up free at <strong>jsonbin.io</strong> → Dashboard → Create Bin → set content to <code>[]</code> → Save<br>
+  <strong>2)</strong> Copy your <strong>Bin ID</strong> (from the URL) and your <strong>Master API Key</strong> (from Account → API Keys)<br>
+  <strong>3)</strong> Open this HTML file and paste them into the two variables at the top of the &lt;script&gt; tag
 </div>
 
 <div class="stats">
@@ -178,7 +184,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;fo
     <div id="upload-login-prompt" class="login-prompt" style="display:none">
       You need to <a onclick="showAuthModal()">sign in</a> to upload projects.
     </div>
-    <div id="upload-form">
+    <div id="upload-form" style="display:none">
       <div class="form-grid">
         <div class="form-row"><label>Project name *</label><input type="text" id="up-name" placeholder="My Tool"></div>
         <div class="form-row">
@@ -194,14 +200,14 @@ footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;fo
       </div>
       <div class="form-row"><label>Description *</label><textarea id="up-desc" placeholder="What does it do?"></textarea></div>
       <div class="form-row">
-        <label>File (optional — max 4 MB)</label>
+        <label>File (optional — keep under ~300 KB)</label>
         <div class="drop-zone" id="drop-zone">
           <input type="file" id="up-file" onchange="onFileChange(this)">
           <p>Drop file here or <span>click to browse</span></p>
           <div class="file-name" id="file-name-display"></div>
           <div class="file-size-warn" id="file-size-warn"></div>
         </div>
-        <div class="size-note">Files are stored as base64 in browser localStorage. Keep under 4 MB for best results.</div>
+        <div class="size-note">Files are stored as base64 inside JSONBin. The free tier has request size limits — keep files small, or paste a download link in the description instead.</div>
       </div>
       <button class="submit-btn" id="submit-btn" onclick="uploadProject()">Save Project</button>
       <div class="status-msg" id="status-msg"></div>
@@ -209,67 +215,76 @@ footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;fo
   </div>
 </div>
 
-<footer>Glitch Viruses · stored locally in your browser</footer>
+<footer>Glitch Viruses · powered by JSONBin.io</footer>
 
 <script>
-const STORAGE_KEY = 'glitch-viruses-projects';
+// ════════════════════════════════════════════════════════
+//  STEP 1: Go to jsonbin.io → sign up free
+//  STEP 2: Dashboard → Create Bin → content: []  → Save
+//  STEP 3: Copy the Bin ID from the URL after /b/
+//  STEP 4: Account → API Keys → copy your Master Key
+//  STEP 5: Paste both below, then re-save this file
+// ════════════════════════════════════════════════════════
+const JSONBIN_BIN_ID  = '69fe2d99a52e261199164ae8';
+const JSONBIN_API_KEY = '$2a$10$YbKH1cc0ik812J3E2CNMx.k2aHeNk2wNmu5fRNqRLU3Mlv7FMy3AG';
+// ════════════════════════════════════════════════════════
+
+const CONFIGURED = !JSONBIN_BIN_ID.includes('PASTE');
+const BIN_URL    = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
 const USERS_KEY   = 'glitch-viruses-users';
 const SESSION_KEY = 'glitch-viruses-session';
 const OWNER_NAME  = 'Glitch';
+const ICONS       = {exe:'⚙️',tool:'🛠️',game:'🎮',script:'📜',web:'🌐'};
+const TYPE_LABEL  = {exe:'EXE',tool:'Tool',game:'Game',script:'Script',web:'Web'};
 
-const ICONS = {exe:'⚙️',tool:'🛠️',game:'🎮',script:'📜',web:'🌐'};
-const TYPE_LABEL = {exe:'EXE',tool:'Tool',game:'Game',script:'Script',web:'Web'};
-
-let projects = [];
-let selectedFile = null;
+let projects        = [];
+let selectedFile    = null;
 let selectedFileB64 = null;
-let currentFilter = 'all';
-let currentUser = null;
+let currentFilter   = 'all';
+let currentUser     = null;
+let isSaving        = false;
 
+/* ── helpers ── */
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
-function isOwner(u){ return u && u.toLowerCase()===OWNER_NAME.toLowerCase(); }
+function isOwner(u){return u&&u.toLowerCase()===OWNER_NAME.toLowerCase();}
+function setStatus(msg,type){const el=document.getElementById('status-msg');el.textContent=msg;el.className='status-msg '+type;}
 
-/* users */
-function getUsers(){ try{return JSON.parse(localStorage.getItem(USERS_KEY)||'{}')}catch(e){return{}} }
-function saveUsers(u){ localStorage.setItem(USERS_KEY,JSON.stringify(u)); }
+/* ── users (local — just credentials) ── */
+function getUsers(){try{return JSON.parse(localStorage.getItem(USERS_KEY)||'{}')}catch(e){return{}}}
+function saveUsers(u){localStorage.setItem(USERS_KEY,JSON.stringify(u));}
 
-/* session */
-function saveSession(u){ localStorage.setItem(SESSION_KEY,u); }
-function clearSession(){ localStorage.removeItem(SESSION_KEY); }
+/* ── session ── */
+function saveSession(u){localStorage.setItem(SESSION_KEY,u);}
+function clearSession(){localStorage.removeItem(SESSION_KEY);}
 function loadSession(){
-  const u = localStorage.getItem(SESSION_KEY);
-  currentUser = u ? {username:u} : null;
+  const u=localStorage.getItem(SESSION_KEY);
+  currentUser=u?{username:u}:null;
   applySession();
 }
-
 function applySession(){
-  const area = document.getElementById('nav-user-area');
-  const signinBtn = document.getElementById('nav-signin-btn');
-  const badge = document.getElementById('nav-owner-badge');
-  const nameEl = document.getElementById('nav-username');
+  const area=document.getElementById('nav-user-area');
+  const signinBtn=document.getElementById('nav-signin-btn');
+  const badge=document.getElementById('nav-owner-badge');
+  document.getElementById('nav-username').textContent=currentUser?currentUser.username:'';
   if(currentUser){
-    area.style.display='flex';
-    signinBtn.style.display='none';
-    nameEl.textContent = currentUser.username;
-    badge.style.display = isOwner(currentUser.username) ? 'inline' : 'none';
+    area.style.display='flex';signinBtn.style.display='none';
+    badge.style.display=isOwner(currentUser.username)?'inline':'none';
   } else {
-    area.style.display='none';
-    signinBtn.style.display='inline';
+    area.style.display='none';signinBtn.style.display='inline';
   }
-  const prompt = document.getElementById('upload-login-prompt');
-  const form = document.getElementById('upload-form');
-  if(currentUser){ prompt.style.display='none'; form.style.display='block'; }
-  else { prompt.style.display='block'; form.style.display='none'; }
+  document.getElementById('upload-login-prompt').style.display=currentUser?'none':'block';
+  document.getElementById('upload-form').style.display=currentUser?'block':'none';
 }
 
-/* modal */
-function showAuthModal(){ document.getElementById('auth-modal').classList.remove('hidden'); }
-function hideAuthModal(){ document.getElementById('auth-modal').classList.add('hidden'); }
-function browseAsGuest(){ hideAuthModal(); }
+/* ── modal ── */
+function showAuthModal(){document.getElementById('auth-modal').classList.remove('hidden');}
+function hideAuthModal(){document.getElementById('auth-modal').classList.add('hidden');}
+function browseAsGuest(){hideAuthModal();}
 function switchTab(tab){
   document.querySelectorAll('.modal-tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
-  document.getElementById('tab-login').style.display = tab==='login'?'block':'none';
-  document.getElementById('tab-register').style.display = tab==='register'?'block':'none';
+  document.getElementById('tab-login').style.display=tab==='login'?'block':'none';
+  document.getElementById('tab-register').style.display=tab==='register'?'block':'none';
 }
 function showErr(id,msg){const el=document.getElementById(id);el.textContent=msg;el.classList.add('show');}
 function clearErr(id){const el=document.getElementById(id);el.textContent='';el.classList.remove('show');}
@@ -279,15 +294,12 @@ function doLogin(){
   const username=document.getElementById('login-user').value.trim();
   const password=document.getElementById('login-pass').value;
   if(!username||!password){showErr('login-err','Fill in all fields.');return;}
-  const users=getUsers();
-  const key=username.toLowerCase();
+  const users=getUsers(),key=username.toLowerCase();
   if(!users[key]){showErr('login-err','Account not found.');return;}
   if(users[key].password!==btoa(password)){showErr('login-err','Wrong password.');return;}
   currentUser={username:users[key].displayName};
-  saveSession(currentUser.username);
-  applySession(); hideAuthModal(); renderGrid(currentFilter);
+  saveSession(currentUser.username);applySession();hideAuthModal();renderGrid(currentFilter);
 }
-
 function doRegister(){
   clearErr('reg-err');
   const username=document.getElementById('reg-user').value.trim();
@@ -296,26 +308,51 @@ function doRegister(){
   if(username.length<2){showErr('reg-err','Username too short.');return;}
   if(password.length<4){showErr('reg-err','Password must be 4+ chars.');return;}
   const users=getUsers();
-  if(users[username.toLowerCase()]){showErr('reg-err','Username already taken.');return;}
+  if(users[username.toLowerCase()]){showErr('reg-err','Username taken.');return;}
   users[username.toLowerCase()]={displayName:username,password:btoa(password)};
-  saveUsers(users);
-  currentUser={username};
-  saveSession(username);
-  applySession(); hideAuthModal(); renderGrid(currentFilter);
+  saveUsers(users);currentUser={username};saveSession(username);applySession();hideAuthModal();renderGrid(currentFilter);
+}
+function doLogout(){currentUser=null;clearSession();applySession();renderGrid(currentFilter);}
+
+/* ── JSONBin API ── */
+async function fetchProjects(){
+  if(!CONFIGURED){
+    document.getElementById('setup-banner').style.display='block';
+    try{projects=JSON.parse(localStorage.getItem('glitch-viruses-projects')||'[]');}catch(e){projects=[];}
+    renderGrid(currentFilter);return;
+  }
+  try{
+    const r=await fetch(BIN_URL+'/latest',{
+      headers:{'X-Master-Key':JSONBIN_API_KEY,'X-Bin-Meta':false}
+    });
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const data=await r.json();
+    projects=Array.isArray(data)?data:(Array.isArray(data.record)?data.record:[]);
+    renderGrid(currentFilter);
+  }catch(e){
+    console.error('Fetch error:',e);
+    setStatus('Could not load projects: '+e.message,'error');
+    renderGrid(currentFilter);
+  }
 }
 
-function doLogout(){ currentUser=null; clearSession(); applySession(); renderGrid(currentFilter); }
-
-/* projects */
-function loadProjects(){
-  try{projects=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(e){projects=[];}
-  renderGrid(currentFilter);
+async function persistProjects(){
+  if(!CONFIGURED){
+    localStorage.setItem('glitch-viruses-projects',JSON.stringify(projects));
+    return;
+  }
+  const r=await fetch(BIN_URL,{
+    method:'PUT',
+    headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_API_KEY},
+    body:JSON.stringify(projects)
+  });
+  if(!r.ok){
+    const txt=await r.text();
+    throw new Error('Save failed (HTTP '+r.status+'): '+txt);
+  }
 }
-function saveProjects(){
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(projects));}
-  catch(e){throw new Error('Storage full. Try removing some projects.');}
-}
 
+/* ── render ── */
 function renderGrid(filter='all'){
   currentFilter=filter;
   const grid=document.getElementById('projects-grid');
@@ -350,21 +387,38 @@ function renderGrid(filter='all'){
 }
 
 function downloadFile(id){
-  const p=projects.find(x=>x.id===id); if(!p||!p.fileB64)return;
+  const p=projects.find(x=>x.id===id);if(!p||!p.fileB64)return;
   const a=document.createElement('a');a.href='data:'+p.fileMime+';base64,'+p.fileB64;a.download=p.fileName||p.name;a.click();
 }
-function deleteProject(id){
+
+async function deleteProject(id){
   if(!confirm('Delete this project?'))return;
-  projects=projects.filter(p=>p.id!==id); saveProjects(); renderGrid(currentFilter);
+  if(isSaving){alert('Another save is in progress, try again in a moment.');return;}
+  isSaving=true;
+  // Re-fetch fresh state first to avoid overwrites
+  try{
+    if(CONFIGURED){
+      const r=await fetch(BIN_URL+'/latest',{headers:{'X-Master-Key':JSONBIN_API_KEY,'X-Bin-Meta':false}});
+      if(r.ok){const d=await r.json();projects=Array.isArray(d)?d:(Array.isArray(d.record)?d.record:[]);}
+    }
+    projects=projects.filter(p=>p.id!==id);
+    await persistProjects();
+    renderGrid(currentFilter);
+  }catch(e){
+    setStatus('Delete failed: '+e.message,'error');
+  }
+  isSaving=false;
 }
 
+/* ── filter buttons ── */
 document.querySelectorAll('.filter-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active'); renderGrid(btn.dataset.filter);
+    btn.classList.add('active');renderGrid(btn.dataset.filter);
   });
 });
 
+/* ── upload panel ── */
 function toggleUpload(){
   const body=document.getElementById('upload-body'),lbl=document.getElementById('upload-toggle-label');
   lbl.textContent=body.classList.toggle('open')?'▲ collapse':'▼ expand';
@@ -376,56 +430,70 @@ function openUpload(){
 }
 
 function onFileChange(input){
-  const file=input.files[0]; if(!file){selectedFile=null;selectedFileB64=null;return;}
-  document.getElementById('file-size-warn').textContent=file.size>4*1024*1024?'⚠ File exceeds 4 MB — it may not save properly.':'';
+  const file=input.files[0];if(!file){selectedFile=null;selectedFileB64=null;return;}
+  document.getElementById('file-size-warn').textContent=file.size>300*1024?'⚠ File may be too large — consider linking externally in the description.':'';
   selectedFile=file;
   document.getElementById('file-name-display').textContent=file.name+' ('+Math.round(file.size/1024)+' KB)';
-  const fr=new FileReader(); fr.onload=()=>{selectedFileB64=fr.result.split(',')[1];}; fr.readAsDataURL(file);
+  const fr=new FileReader();fr.onload=()=>{selectedFileB64=fr.result.split(',')[1];};fr.readAsDataURL(file);
 }
 
 const dz=document.getElementById('drop-zone');
-dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
 dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
 dz.addEventListener('drop',e=>{
   e.preventDefault();dz.classList.remove('drag');
-  const f=e.dataTransfer.files[0]; if(!f)return;
+  const f=e.dataTransfer.files[0];if(!f)return;
   selectedFile=f;
   document.getElementById('file-name-display').textContent=f.name+' ('+Math.round(f.size/1024)+' KB)';
-  document.getElementById('file-size-warn').textContent=f.size>4*1024*1024?'⚠ File exceeds 4 MB.':'';
-  const fr=new FileReader(); fr.onload=()=>{selectedFileB64=fr.result.split(',')[1];}; fr.readAsDataURL(f);
+  document.getElementById('file-size-warn').textContent=f.size>300*1024?'⚠ File may be too large for the free tier.':'';
+  const fr=new FileReader();fr.onload=()=>{selectedFileB64=fr.result.split(',')[1];};fr.readAsDataURL(f);
 });
 
-function setStatus(msg,type){const el=document.getElementById('status-msg');el.textContent=msg;el.className='status-msg '+type;}
-
-function uploadProject(){
+async function uploadProject(){
   if(!currentUser){showAuthModal();return;}
+  if(isSaving){setStatus('A save is in progress, please wait…','loading');return;}
   const name=document.getElementById('up-name').value.trim();
   const type=document.getElementById('up-type').value;
   const desc=document.getElementById('up-desc').value.trim();
   if(!name||!desc){setStatus('Please fill in name and description.','error');return;}
-  const btn=document.getElementById('submit-btn'); btn.disabled=true; setStatus('Saving…','loading');
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;isSaving=true;setStatus('Saving to the cloud…','loading');
   try{
+    // Always fetch latest before writing to avoid race conditions
+    if(CONFIGURED){
+      const r=await fetch(BIN_URL+'/latest',{headers:{'X-Master-Key':JSONBIN_API_KEY,'X-Bin-Meta':false}});
+      if(r.ok){const d=await r.json();projects=Array.isArray(d)?d:(Array.isArray(d.record)?d.record:[]);}
+    }
     const entry={
       id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
       name,type,desc,uploader:currentUser.username,
       date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),
+      createdAt:Date.now(),
       fileB64:selectedFileB64||null,
       fileName:selectedFile?selectedFile.name:null,
       fileMime:selectedFile?selectedFile.type||'application/octet-stream':null,
     };
-    projects.unshift(entry); saveProjects(); setStatus('Project saved!','success'); renderGrid(currentFilter);
+    projects.unshift(entry);
+    await persistProjects();
+    setStatus('Saved! Everyone can see it now. 🎉','success');
+    renderGrid(currentFilter);
     document.getElementById('up-name').value='';
     document.getElementById('up-desc').value='';
     document.getElementById('file-name-display').textContent='';
     document.getElementById('file-size-warn').textContent='';
     document.getElementById('up-file').value='';
-    selectedFile=null; selectedFileB64=null;
-  }catch(e){ projects.shift(); setStatus('Error saving: '+e.message,'error'); }
-  btn.disabled=false;
+    selectedFile=null;selectedFileB64=null;
+  }catch(e){
+    projects.shift();
+    setStatus('Error: '+e.message,'error');
+  }
+  btn.disabled=false;isSaving=false;
 }
 
+/* ── boot ── */
 loadSession();
-loadProjects();
+fetchProjects();
+setInterval(fetchProjects,30000); // refresh every 30s
 </script>
 </body>
 </html>
