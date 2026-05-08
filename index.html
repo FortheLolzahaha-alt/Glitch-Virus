@@ -1,4 +1,9 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glitch Viruses</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#121212;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif}
@@ -32,7 +37,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .tag-game{background:#1a2a1a;color:#4ade80;border:1px solid #1f3d1f}
 .tag-web{background:#2a1f1a;color:#fb923c;border:1px solid #3d2a1f}
 .tag-script{background:#221a2a;color:#a78bfa;border:1px solid #321f3d}
-.tag-folder{background:#1a2020;color:#2dd4bf;border:1px solid #1f3535}
 .card-title{font-size:.95rem;font-weight:600;color:#fff;margin-bottom:5px}
 .card-desc{font-size:.82rem;color:#777;line-height:1.6;flex:1}
 .card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid #242424}
@@ -71,8 +75,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .size-note{font-size:.75rem;color:#555;margin-top:6px;line-height:1.5}
 footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;font-size:.82rem;margin-top:8px}
 </style>
-
-<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Glitch Viruses project library</h2>
+</head>
+<body>
 
 <nav>
   <div class="nav-logo">Glitch Viruses</div>
@@ -140,7 +144,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;fo
         <div class="file-name" id="file-name-display"></div>
         <div class="file-size-warn" id="file-size-warn"></div>
       </div>
-      <div class="size-note">Files are stored as base64 in browser storage. Keep under 4 MB for best results. Large files may be rejected.</div>
+      <div class="size-note">Files are stored as base64 in browser localStorage. Keep under 4 MB for best results. Large files may be rejected.</div>
     </div>
     <button class="submit-btn" id="submit-btn" onclick="uploadProject()">Save Project</button>
     <div class="status-msg" id="status-msg"></div>
@@ -160,16 +164,23 @@ let currentFilter = 'all';
 
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 
-async function loadProjects(){
-  try{
-    const r = await window.storage.get(STORAGE_KEY);
-    projects = r ? JSON.parse(r.value) : [];
-  }catch(e){ projects=[]; }
+function loadProjects(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    projects = raw ? JSON.parse(raw) : [];
+  } catch(e) {
+    projects = [];
+  }
   renderGrid(currentFilter);
 }
 
-async function saveProjects(){
-  await window.storage.set(STORAGE_KEY, JSON.stringify(projects));
+function saveProjects(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+  } catch(e) {
+    // localStorage full or unavailable
+    throw new Error('Storage full or unavailable. Try removing some projects.');
+  }
 }
 
 function renderGrid(filter='all'){
@@ -209,10 +220,10 @@ function downloadFile(id){
   a.click();
 }
 
-async function deleteProject(id){
+function deleteProject(id){
   if(!confirm('Delete this project?')) return;
   projects = projects.filter(p=>p.id!==id);
-  await saveProjects();
+  saveProjects();
   renderGrid(currentFilter);
 }
 
@@ -258,7 +269,8 @@ dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
 dz.addEventListener('drop',e=>{
   e.preventDefault();dz.classList.remove('drag');
   const f=e.dataTransfer.files[0];
-  if(f){ document.getElementById('up-file').files; selectedFile=f;
+  if(f){
+    selectedFile=f;
     document.getElementById('file-name-display').textContent=f.name+' ('+Math.round(f.size/1024)+' KB)';
     const warn=document.getElementById('file-size-warn');
     if(f.size>4*1024*1024){ warn.textContent='⚠ File exceeds 4 MB — it may not save properly.'; } else { warn.textContent=''; }
@@ -273,7 +285,7 @@ function setStatus(msg,type){
   el.textContent=msg;el.className='status-msg '+type;
 }
 
-async function uploadProject(){
+function uploadProject(){
   const name=document.getElementById('up-name').value.trim();
   const type=document.getElementById('up-type').value;
   const desc=document.getElementById('up-desc').value.trim();
@@ -291,7 +303,7 @@ async function uploadProject(){
       fileMime: selectedFile?selectedFile.type||'application/octet-stream':null,
     };
     projects.unshift(entry);
-    await saveProjects();
+    saveProjects();
     setStatus('Project saved!','success');
     renderGrid(currentFilter);
     document.getElementById('up-name').value='';
@@ -309,3 +321,5 @@ async function uploadProject(){
 
 loadProjects();
 </script>
+</body>
+</html>
