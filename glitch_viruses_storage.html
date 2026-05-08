@@ -1,0 +1,311 @@
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#121212;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid #2a2a2a;background:#121212;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:1rem;font-weight:600;color:#fff}
+.nav-links{display:flex;gap:20px}
+.nav-links a{font-size:.875rem;color:#888;transition:color .15s;cursor:pointer}
+.nav-links a:hover{color:#e0e0e0}
+.hero{padding:40px 28px 28px;max-width:680px}
+.hero h1{font-size:1.9rem;font-weight:600;color:#fff;line-height:1.25;margin-bottom:10px}
+.hero p{font-size:.925rem;color:#888;line-height:1.7}
+.stats{display:flex;gap:40px;padding:16px 28px;border-top:1px solid #2a2a2a;border-bottom:1px solid #2a2a2a}
+.stat-num{font-size:1.5rem;font-weight:600;color:#fff}
+.stat-label{font-size:.78rem;color:#666;margin-top:2px}
+.filter-bar{display:flex;gap:8px;padding:20px 28px 0;flex-wrap:wrap;align-items:center}
+.filter-label{font-size:.82rem;color:#666;margin-right:4px}
+.filter-btn{padding:5px 13px;border-radius:5px;border:1px solid #2a2a2a;background:transparent;color:#888;font-size:.8rem;cursor:pointer;transition:all .15s}
+.filter-btn:hover{border-color:#444;color:#ccc}
+.filter-btn.active{background:#2a2a2a;border-color:#444;color:#fff}
+.projects{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:20px 28px}
+.project-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s}
+.project-card:hover{border-color:#3a3a3a}
+.card-icon{height:80px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:#1e1e1e;border-bottom:1px solid #2a2a2a;position:relative}
+.new-badge{position:absolute;top:8px;right:8px;background:#22c55e;color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:3px}
+.card-body{padding:14px;flex:1;display:flex;flex-direction:column}
+.card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.tag{font-size:.7rem;padding:2px 7px;border-radius:3px;font-weight:500}
+.tag-exe{background:#2a1a1a;color:#f87171;border:1px solid #3d1f1f}
+.tag-tool{background:#1a1f2a;color:#60a5fa;border:1px solid #1f2d3d}
+.tag-game{background:#1a2a1a;color:#4ade80;border:1px solid #1f3d1f}
+.tag-web{background:#2a1f1a;color:#fb923c;border:1px solid #3d2a1f}
+.tag-script{background:#221a2a;color:#a78bfa;border:1px solid #321f3d}
+.tag-folder{background:#1a2020;color:#2dd4bf;border:1px solid #1f3535}
+.card-title{font-size:.95rem;font-weight:600;color:#fff;margin-bottom:5px}
+.card-desc{font-size:.82rem;color:#777;line-height:1.6;flex:1}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid #242424}
+.card-meta{font-size:.75rem;color:#555}
+.dl-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;background:#1e1e1e;border:1px solid #2a2a2a;color:#aaa;font-size:.78rem;cursor:pointer;transition:all .15s}
+.dl-btn:hover{border-color:#555;color:#fff}
+.del-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;background:transparent;border:1px solid #3d1f1f;color:#f87171;font-size:.78rem;cursor:pointer;transition:all .15s}
+.del-btn:hover{background:#2a1a1a}
+.upload-section{margin:8px 28px 28px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden}
+.upload-header{padding:14px 18px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.upload-header h2{font-size:.95rem;font-weight:600;color:#fff}
+.upload-header span{font-size:.8rem;color:#555}
+.upload-body{padding:18px;display:none}
+.upload-body.open{display:block}
+.form-row{margin-bottom:13px}
+.form-row label{display:block;font-size:.78rem;color:#666;margin-bottom:5px}
+.form-row input,.form-row textarea,.form-row select{width:100%;background:#121212;border:1px solid #2a2a2a;border-radius:6px;padding:8px 11px;color:#e0e0e0;font-size:.85rem;font-family:inherit;transition:border-color .15s}
+.form-row input:focus,.form-row textarea:focus,.form-row select:focus{outline:none;border-color:#444}
+.form-row textarea{resize:vertical;min-height:70px}
+.form-row select option{background:#1a1a1a}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.drop-zone{border:1px dashed #333;border-radius:7px;padding:28px;text-align:center;cursor:pointer;transition:border-color .15s;position:relative}
+.drop-zone:hover,.drop-zone.drag{border-color:#555}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-zone p{font-size:.82rem;color:#555}
+.drop-zone p span{color:#888}
+.file-name{font-size:.8rem;color:#6ee7b7;margin-top:8px}
+.file-size-warn{font-size:.75rem;color:#f87171;margin-top:6px}
+.submit-btn{width:100%;padding:10px;border-radius:7px;background:#2a2a2a;border:1px solid #383838;color:#fff;font-size:.875rem;font-weight:500;cursor:pointer;transition:background .15s;margin-top:4px}
+.submit-btn:hover{background:#333}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+.status-msg{margin-top:10px;font-size:.8rem;padding:8px 12px;border-radius:6px;display:none}
+.status-msg.success{background:#1a2a1a;border:1px solid #1f3d1f;color:#4ade80;display:block}
+.status-msg.error{background:#2a1a1a;border:1px solid #3d1f1f;color:#f87171;display:block}
+.status-msg.loading{background:#1e1e1e;border:1px solid #2a2a2a;color:#888;display:block}
+.size-note{font-size:.75rem;color:#555;margin-top:6px;line-height:1.5}
+footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;font-size:.82rem;margin-top:8px}
+</style>
+
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Glitch Viruses project library</h2>
+
+<nav>
+  <div class="nav-logo">Glitch Viruses</div>
+  <div class="nav-links">
+    <a onclick="document.getElementById('projects-section').scrollIntoView({behavior:'smooth'})">Projects</a>
+    <a onclick="openUpload()">Upload</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Glitch Viruses</h1>
+  <p>A collection of tools, executables, games, and scripts. Upload your own — everything is stored locally in your browser.</p>
+</div>
+
+<div class="stats">
+  <div><div class="stat-num" id="proj-count">0</div><div class="stat-label">Projects</div></div>
+  <div><div class="stat-num" id="file-count">0</div><div class="stat-label">Files stored</div></div>
+</div>
+
+<div class="filter-bar" id="projects-section">
+  <span class="filter-label">Filter:</span>
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="exe">EXE</button>
+  <button class="filter-btn" data-filter="tool">Tool</button>
+  <button class="filter-btn" data-filter="game">Game</button>
+  <button class="filter-btn" data-filter="script">Script</button>
+  <button class="filter-btn" data-filter="web">Web</button>
+</div>
+
+<div class="projects" id="projects-grid">
+  <div style="grid-column:1/-1;text-align:center;padding:40px;color:#444;font-size:.9rem">Loading…</div>
+</div>
+
+<div class="upload-section" id="upload-section">
+  <div class="upload-header" onclick="toggleUpload()">
+    <h2>Upload a project</h2>
+    <span id="upload-toggle-label">▼ expand</span>
+  </div>
+  <div class="upload-body" id="upload-body">
+    <div class="form-grid">
+      <div class="form-row">
+        <label>Project name *</label>
+        <input type="text" id="up-name" placeholder="My Tool">
+      </div>
+      <div class="form-row">
+        <label>Type *</label>
+        <select id="up-type">
+          <option value="exe">EXE</option>
+          <option value="tool">Tool</option>
+          <option value="game">Game</option>
+          <option value="script">Script</option>
+          <option value="web">Web</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Description *</label>
+      <textarea id="up-desc" placeholder="What does it do?"></textarea>
+    </div>
+    <div class="form-row">
+      <label>File (optional — max 4 MB)</label>
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="up-file" onchange="onFileChange(this)">
+        <p>Drop file here or <span>click to browse</span></p>
+        <div class="file-name" id="file-name-display"></div>
+        <div class="file-size-warn" id="file-size-warn"></div>
+      </div>
+      <div class="size-note">Files are stored as base64 in browser storage. Keep under 4 MB for best results. Large files may be rejected.</div>
+    </div>
+    <button class="submit-btn" id="submit-btn" onclick="uploadProject()">Save Project</button>
+    <div class="status-msg" id="status-msg"></div>
+  </div>
+</div>
+
+<footer>Glitch Viruses · stored locally in your browser</footer>
+
+<script>
+const STORAGE_KEY = 'glitch-viruses-projects';
+const ICONS = {exe:'⚙️',tool:'🛠️',game:'🎮',script:'📜',web:'🌐'};
+const TYPE_LABEL = {exe:'EXE',tool:'Tool',game:'Game',script:'Script',web:'Web'};
+let projects = [];
+let selectedFile = null;
+let selectedFileB64 = null;
+let currentFilter = 'all';
+
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+
+async function loadProjects(){
+  try{
+    const r = await window.storage.get(STORAGE_KEY);
+    projects = r ? JSON.parse(r.value) : [];
+  }catch(e){ projects=[]; }
+  renderGrid(currentFilter);
+}
+
+async function saveProjects(){
+  await window.storage.set(STORAGE_KEY, JSON.stringify(projects));
+}
+
+function renderGrid(filter='all'){
+  currentFilter = filter;
+  const grid = document.getElementById('projects-grid');
+  const visible = filter==='all' ? projects : projects.filter(p=>p.type===filter);
+  document.getElementById('proj-count').textContent = projects.length;
+  document.getElementById('file-count').textContent = projects.filter(p=>p.fileB64).length;
+  if(!visible.length){
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:#444;font-size:.9rem">${projects.length?'No projects match this filter.':'No projects yet — upload one below!'}</div>`;
+    return;
+  }
+  grid.innerHTML = visible.map((p,i)=>`
+    <div class="project-card">
+      <div class="card-icon">${ICONS[p.type]||'📦'}${i===0&&filter==='all'?'<span class="new-badge">NEW</span>':''}</div>
+      <div class="card-body">
+        <div class="card-tags"><span class="tag tag-${p.type}">${TYPE_LABEL[p.type]||p.type}</span></div>
+        <div class="card-title">${esc(p.name)}</div>
+        <div class="card-desc">${esc(p.desc)}</div>
+        <div class="card-footer">
+          <span class="card-meta">${p.date||''}</span>
+          <div class="card-links" style="display:flex;gap:6px">
+            ${p.fileB64?`<button class="dl-btn" onclick="downloadFile('${p.id}')">⬇ Download</button>`:''}
+            <button class="del-btn" onclick="deleteProject('${p.id}')">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function downloadFile(id){
+  const p = projects.find(x=>x.id===id);
+  if(!p||!p.fileB64) return;
+  const a=document.createElement('a');
+  a.href='data:'+p.fileMime+';base64,'+p.fileB64;
+  a.download=p.fileName||p.name;
+  a.click();
+}
+
+async function deleteProject(id){
+  if(!confirm('Delete this project?')) return;
+  projects = projects.filter(p=>p.id!==id);
+  await saveProjects();
+  renderGrid(currentFilter);
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid(btn.dataset.filter);
+  });
+});
+
+function toggleUpload(){
+  const body=document.getElementById('upload-body');
+  const lbl=document.getElementById('upload-toggle-label');
+  lbl.textContent=body.classList.toggle('open')?'▲ collapse':'▼ expand';
+}
+function openUpload(){
+  document.getElementById('upload-section').scrollIntoView({behavior:'smooth'});
+  const body=document.getElementById('upload-body');
+  if(!body.classList.contains('open')){
+    body.classList.add('open');
+    document.getElementById('upload-toggle-label').textContent='▲ collapse';
+  }
+}
+
+function onFileChange(input){
+  const file=input.files[0];
+  if(!file){selectedFile=null;selectedFileB64=null;return;}
+  const warn=document.getElementById('file-size-warn');
+  if(file.size>4*1024*1024){
+    warn.textContent='⚠ File exceeds 4 MB — it may not save properly.';
+  } else { warn.textContent=''; }
+  selectedFile=file;
+  document.getElementById('file-name-display').textContent=file.name+' ('+Math.round(file.size/1024)+' KB)';
+  const fr=new FileReader();
+  fr.onload=()=>{ selectedFileB64=fr.result.split(',')[1]; };
+  fr.readAsDataURL(file);
+}
+
+const dz=document.getElementById('drop-zone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{
+  e.preventDefault();dz.classList.remove('drag');
+  const f=e.dataTransfer.files[0];
+  if(f){ document.getElementById('up-file').files; selectedFile=f;
+    document.getElementById('file-name-display').textContent=f.name+' ('+Math.round(f.size/1024)+' KB)';
+    const warn=document.getElementById('file-size-warn');
+    if(f.size>4*1024*1024){ warn.textContent='⚠ File exceeds 4 MB — it may not save properly.'; } else { warn.textContent=''; }
+    const fr=new FileReader();
+    fr.onload=()=>{selectedFileB64=fr.result.split(',')[1];};
+    fr.readAsDataURL(f);
+  }
+});
+
+function setStatus(msg,type){
+  const el=document.getElementById('status-msg');
+  el.textContent=msg;el.className='status-msg '+type;
+}
+
+async function uploadProject(){
+  const name=document.getElementById('up-name').value.trim();
+  const type=document.getElementById('up-type').value;
+  const desc=document.getElementById('up-desc').value.trim();
+  if(!name||!desc){setStatus('Please fill in name and description.','error');return;}
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;
+  setStatus('Saving…','loading');
+  try{
+    const entry={
+      id: Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+      name,type,desc,
+      date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),
+      fileB64: selectedFileB64||null,
+      fileName: selectedFile?selectedFile.name:null,
+      fileMime: selectedFile?selectedFile.type||'application/octet-stream':null,
+    };
+    projects.unshift(entry);
+    await saveProjects();
+    setStatus('Project saved!','success');
+    renderGrid(currentFilter);
+    document.getElementById('up-name').value='';
+    document.getElementById('up-desc').value='';
+    document.getElementById('file-name-display').textContent='';
+    document.getElementById('file-size-warn').textContent='';
+    document.getElementById('up-file').value='';
+    selectedFile=null;selectedFileB64=null;
+  }catch(e){
+    projects.shift();
+    setStatus('Error saving: '+e.message,'error');
+  }
+  btn.disabled=false;
+}
+
+loadProjects();
+</script>
