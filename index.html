@@ -3,25 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Glitch Viruses</title>
+<title>Glitch Viruses 2</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#121212;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif}
 a{color:inherit;text-decoration:none}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .modal-overlay.hidden{display:none}
-.modal{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:28px;width:100%;max-width:360px}
+.modal{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:28px;width:100%;max-width:380px}
 .modal h2{font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:6px}
 .modal>p{font-size:.82rem;color:#666;margin-bottom:20px}
 .modal .form-row{margin-bottom:12px}
 .modal .form-row label{display:block;font-size:.78rem;color:#666;margin-bottom:5px}
-.modal .form-row input{width:100%;background:#121212;border:1px solid #2a2a2a;border-radius:6px;padding:9px 11px;color:#e0e0e0;font-size:.85rem;font-family:inherit;transition:border-color .15s}
-.modal .form-row input:focus{outline:none;border-color:#444}
+.modal .form-row input,.modal .form-row textarea,.modal .form-row select{width:100%;background:#121212;border:1px solid #2a2a2a;border-radius:6px;padding:9px 11px;color:#e0e0e0;font-size:.85rem;font-family:inherit;transition:border-color .15s}
+.modal .form-row input:focus,.modal .form-row textarea:focus,.modal .form-row select:focus{outline:none;border-color:#444}
+.modal .form-row textarea{resize:vertical;min-height:80px}
+.modal .form-row select option{background:#1a1a1a}
 .modal-tabs{display:flex;margin-bottom:20px;border:1px solid #2a2a2a;border-radius:7px;overflow:hidden}
 .modal-tab{flex:1;padding:8px;background:transparent;border:none;color:#666;font-size:.82rem;cursor:pointer;transition:all .15s}
 .modal-tab.active{background:#2a2a2a;color:#fff}
 .modal-btn{width:100%;padding:10px;border-radius:7px;background:#2a2a2a;border:1px solid #383838;color:#fff;font-size:.875rem;font-weight:500;cursor:pointer;transition:background .15s;margin-top:4px}
 .modal-btn:hover{background:#333}
+.modal-btn.danger{background:#3d1f1f;border-color:#5a2a2a;color:#f87171}
+.modal-btn.danger:hover{background:#4a2020}
 .modal-err{font-size:.78rem;color:#f87171;margin-top:8px;display:none}
 .modal-err.show{display:block}
 nav{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid #2a2a2a;background:#121212;position:sticky;top:0;z-index:100}
@@ -64,8 +68,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .card-desc{font-size:.82rem;color:#777;line-height:1.6;flex:1}
 .card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid #242424}
 .card-meta{font-size:.75rem;color:#555}
+.card-actions{display:flex;gap:6px}
 .dl-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;background:#1e1e1e;border:1px solid #2a2a2a;color:#aaa;font-size:.78rem;cursor:pointer;transition:all .15s}
 .dl-btn:hover{border-color:#555;color:#fff}
+.edit-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;background:transparent;border:1px solid #1f2d3d;color:#60a5fa;font-size:.78rem;cursor:pointer;transition:all .15s}
+.edit-btn:hover{background:#1a1f2a}
 .del-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;background:transparent;border:1px solid #3d1f1f;color:#f87171;font-size:.78rem;cursor:pointer;transition:all .15s}
 .del-btn:hover{background:#2a1a1a}
 .upload-section{margin:8px 28px 28px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden}
@@ -98,14 +105,12 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .size-note{font-size:.75rem;color:#555;margin-top:6px;line-height:1.5}
 .login-prompt{font-size:.82rem;color:#555;padding:12px 14px;background:#161616;border:1px solid #222;border-radius:7px;margin-bottom:14px}
 .login-prompt a{color:#60a5fa;cursor:pointer}
-.setup-banner{background:#1a1f2a;border:1px solid #1f2d3d;border-radius:8px;padding:14px 18px;margin:16px 28px;font-size:.82rem;color:#60a5fa;line-height:1.8}
-.setup-banner strong{color:#93c5fd}
-.setup-banner code{background:#121212;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:.8rem;color:#c084fc}
 footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;font-size:.82rem;margin-top:8px}
 </style>
 </head>
 <body>
 
+<!-- AUTH MODAL -->
 <div class="modal-overlay hidden" id="auth-modal">
   <div class="modal">
     <h2>Welcome to Glitch Viruses</h2>
@@ -130,6 +135,29 @@ footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;fo
   </div>
 </div>
 
+<!-- EDIT MODAL (owner only) -->
+<div class="modal-overlay hidden" id="edit-modal">
+  <div class="modal">
+    <h2>✏️ Edit Project</h2>
+    <p>Modify this project's details.</p>
+    <div class="form-row"><label>Project name</label><input type="text" id="edit-name" placeholder="My Tool"></div>
+    <div class="form-row">
+      <label>Type</label>
+      <select id="edit-type">
+        <option value="exe">EXE</option>
+        <option value="tool">Tool</option>
+        <option value="game">Game</option>
+        <option value="script">Script</option>
+        <option value="web">Web</option>
+      </select>
+    </div>
+    <div class="form-row"><label>Description</label><textarea id="edit-desc" placeholder="What does it do?"></textarea></div>
+    <button class="modal-btn" onclick="saveEdit()">Save Changes</button>
+    <button class="modal-btn danger" style="margin-top:8px" onclick="closeEditModal()">Cancel</button>
+    <div class="modal-err" id="edit-err"></div>
+  </div>
+</div>
+
 <nav>
   <div class="nav-logo">Glitch Viruses</div>
   <div class="nav-links">
@@ -145,15 +173,8 @@ footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;fo
 </nav>
 
 <div class="hero">
-  <h1>Glitch Viruses</h1>
+  <h1>Glitch Viruses 2</h1>
   <p>A collection of tools, executables, games, and scripts. Upload your own — projects are shared with everyone.</p>
-</div>
-
-<div id="setup-banner" class="setup-banner" style="display:none">
-  ⚠️ <strong>JSONBin not configured yet — projects are only visible to you.</strong><br>
-  <strong>1)</strong> Sign up free at <strong>jsonbin.io</strong> → Dashboard → Create Bin → set content to <code>[]</code> → Save<br>
-  <strong>2)</strong> Copy your <strong>Bin ID</strong> (from the URL) and your <strong>Master API Key</strong> (from Account → API Keys)<br>
-  <strong>3)</strong> Open this HTML file and paste them into the two variables at the top of the &lt;script&gt; tag
 </div>
 
 <div class="stats">
@@ -207,7 +228,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;fo
           <div class="file-name" id="file-name-display"></div>
           <div class="file-size-warn" id="file-size-warn"></div>
         </div>
-        <div class="size-note">Files are stored as base64 inside JSONBin. The free tier has request size limits — keep files small, or paste a download link in the description instead.</div>
+        <div class="size-note">Files are stored as base64 in JSONBin. Keep under ~300 KB, or paste a download link in the description instead.</div>
       </div>
       <button class="submit-btn" id="submit-btn" onclick="uploadProject()">Save Project</button>
       <div class="status-msg" id="status-msg"></div>
@@ -218,22 +239,12 @@ footer{text-align:center;padding:24px;border-top:1px solid #2a2a2a;color:#444;fo
 <footer>Glitch Viruses · powered by JSONBin.io</footer>
 
 <script>
-// ════════════════════════════════════════════════════════
-//  STEP 1: Go to jsonbin.io → sign up free
-//  STEP 2: Dashboard → Create Bin → content: []  → Save
-//  STEP 3: Copy the Bin ID from the URL after /b/
-//  STEP 4: Account → API Keys → copy your Master Key
-//  STEP 5: Paste both below, then re-save this file
-// ════════════════════════════════════════════════════════
-const JSONBIN_BIN_ID  = '69fe3485adc21f119a71d41a';
-const JSONBIN_API_KEY = '$2a$10$HDjJOu1Pd8zpFRbHxnjJMuokZPID/j6T7TmAkjuZpbfwcM98eVnlO';
-// ════════════════════════════════════════════════════════
+const JSONBIN_BIN_ID  = '69fee8f2adc21f119a753780';
+const JSONBIN_API_KEY = '$2a$10$ITxL7ESZah9JZHo7V2w1u6u35V.jW76F7JRsCLUfaMFuWADyjz/m';
+const BIN_URL         = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
-const CONFIGURED = !JSONBIN_BIN_ID.includes('PASTE');
-const BIN_URL    = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
-
-const USERS_KEY   = 'glitch-viruses-users';
-const SESSION_KEY = 'glitch-viruses-session';
+const USERS_KEY   = 'glitch-viruses-users-2';
+const SESSION_KEY = 'glitch-viruses-session-2';
 const OWNER_NAME  = 'Glitch';
 const ICONS       = {exe:'⚙️',tool:'🛠️',game:'🎮',script:'📜',web:'🌐'};
 const TYPE_LABEL  = {exe:'EXE',tool:'Tool',game:'Game',script:'Script',web:'Web'};
@@ -244,13 +255,13 @@ let selectedFileB64 = null;
 let currentFilter   = 'all';
 let currentUser     = null;
 let isSaving        = false;
+let editingId       = null;
 
-/* ── helpers ── */
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 function isOwner(u){return u&&u.toLowerCase()===OWNER_NAME.toLowerCase();}
 function setStatus(msg,type){const el=document.getElementById('status-msg');el.textContent=msg;el.className='status-msg '+type;}
 
-/* ── users (local — just credentials) ── */
+/* ── users ── */
 function getUsers(){try{return JSON.parse(localStorage.getItem(USERS_KEY)||'{}')}catch(e){return{}}}
 function saveUsers(u){localStorage.setItem(USERS_KEY,JSON.stringify(u));}
 
@@ -277,7 +288,7 @@ function applySession(){
   document.getElementById('upload-form').style.display=currentUser?'block':'none';
 }
 
-/* ── modal ── */
+/* ── auth modal ── */
 function showAuthModal(){document.getElementById('auth-modal').classList.remove('hidden');}
 function hideAuthModal(){document.getElementById('auth-modal').classList.add('hidden');}
 function browseAsGuest(){hideAuthModal();}
@@ -314,42 +325,63 @@ function doRegister(){
 }
 function doLogout(){currentUser=null;clearSession();applySession();renderGrid(currentFilter);}
 
-/* ── JSONBin API ── */
-async function fetchProjects(){
-  if(!CONFIGURED){
-    document.getElementById('setup-banner').style.display='block';
-    try{projects=JSON.parse(localStorage.getItem('glitch-viruses-projects')||'[]');}catch(e){projects=[];}
-    renderGrid(currentFilter);return;
-  }
+/* ── edit modal ── */
+function openEditModal(id){
+  const p=projects.find(x=>x.id===id);if(!p)return;
+  editingId=id;
+  document.getElementById('edit-name').value=p.name;
+  document.getElementById('edit-type').value=p.type;
+  document.getElementById('edit-desc').value=p.desc;
+  clearErr('edit-err');
+  document.getElementById('edit-modal').classList.remove('hidden');
+}
+function closeEditModal(){document.getElementById('edit-modal').classList.add('hidden');editingId=null;}
+
+async function saveEdit(){
+  const name=document.getElementById('edit-name').value.trim();
+  const type=document.getElementById('edit-type').value;
+  const desc=document.getElementById('edit-desc').value.trim();
+  if(!name||!desc){showErr('edit-err','Name and description are required.');return;}
+  if(isSaving){showErr('edit-err','Another save is in progress.');return;}
+  isSaving=true;
   try{
-    const r=await fetch(BIN_URL+'/latest',{
-      headers:{'X-Master-Key':JSONBIN_API_KEY,'X-Bin-Meta':false}
-    });
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const data=await r.json();
-    projects=Array.isArray(data)?data:(Array.isArray(data.record)?data.record:[]);
+    const fresh=await fetchLatest();
+    if(fresh)projects=fresh;
+    const idx=projects.findIndex(x=>x.id===editingId);
+    if(idx===-1){showErr('edit-err','Project not found.');isSaving=false;return;}
+    projects[idx]={...projects[idx],name,type,desc,editedAt:Date.now()};
+    await persistProjects();
+    renderGrid(currentFilter);
+    closeEditModal();
+  }catch(e){showErr('edit-err','Save failed: '+e.message);}
+  isSaving=false;
+}
+
+/* ── JSONBin ── */
+async function fetchLatest(){
+  const r=await fetch(BIN_URL+'/latest',{headers:{'X-Master-Key':JSONBIN_API_KEY,'X-Bin-Meta':false}});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const d=await r.json();
+  return Array.isArray(d)?d:(Array.isArray(d.record)?d.record:[]);
+}
+
+async function fetchProjects(){
+  try{
+    projects=await fetchLatest();
     renderGrid(currentFilter);
   }catch(e){
-    console.error('Fetch error:',e);
-    setStatus('Could not load projects: '+e.message,'error');
-    renderGrid(currentFilter);
+    console.error(e);
+    document.getElementById('projects-grid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:#f87171;font-size:.9rem">Could not load projects: ${e.message}</div>`;
   }
 }
 
 async function persistProjects(){
-  if(!CONFIGURED){
-    localStorage.setItem('glitch-viruses-projects',JSON.stringify(projects));
-    return;
-  }
   const r=await fetch(BIN_URL,{
     method:'PUT',
     headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_API_KEY},
     body:JSON.stringify(projects)
   });
-  if(!r.ok){
-    const txt=await r.text();
-    throw new Error('Save failed (HTTP '+r.status+'): '+txt);
-  }
+  if(!r.ok){const t=await r.text();throw new Error('HTTP '+r.status+': '+t);}
 }
 
 /* ── render ── */
@@ -366,8 +398,9 @@ function renderGrid(filter='all'){
   grid.innerHTML=visible.map((p,i)=>{
     const ownerUp=isOwner(p.uploader);
     const uploaderHTML=p.uploader
-      ?`<span class="card-uploader"><span class="u-name">${esc(p.uploader)}</span>${ownerUp?`<span class="owner-badge" style="font-size:.55rem;padding:1px 5px">👑 Owner</span>`:''}</span>`:'';
+      ?`<span class="card-uploader"><span class="u-name">${esc(p.uploader)}</span>${ownerUp?`<span class="owner-badge" style="font-size:.55rem;padding:1px 5px">👑</span>`:''}</span>`:'';
     const canDel=currentUser&&(currentUser.username===p.uploader||isOwner(currentUser.username));
+    const canEdit=currentUser&&isOwner(currentUser.username);
     return`<div class="project-card">
       <div class="card-icon">${ICONS[p.type]||'📦'}${i===0&&filter==='all'?'<span class="new-badge">NEW</span>':''}</div>
       <div class="card-body">
@@ -376,8 +409,9 @@ function renderGrid(filter='all'){
         <div class="card-desc">${esc(p.desc)}</div>
         <div class="card-footer">
           <span class="card-meta">${p.date||''}</span>
-          <div style="display:flex;gap:6px">
+          <div class="card-actions">
             ${p.fileB64?`<button class="dl-btn" onclick="downloadFile('${p.id}')">⬇ Download</button>`:''}
+            ${canEdit?`<button class="edit-btn" onclick="openEditModal('${p.id}')">✏️</button>`:''}
             ${canDel?`<button class="del-btn" onclick="deleteProject('${p.id}')">✕</button>`:''}
           </div>
         </div>
@@ -393,32 +427,23 @@ function downloadFile(id){
 
 async function deleteProject(id){
   if(!confirm('Delete this project?'))return;
-  if(isSaving){alert('Another save is in progress, try again in a moment.');return;}
+  if(isSaving){alert('Another save is in progress, try again shortly.');return;}
   isSaving=true;
-  // Re-fetch fresh state first to avoid overwrites
   try{
-    if(CONFIGURED){
-      const r=await fetch(BIN_URL+'/latest',{headers:{'X-Master-Key':JSONBIN_API_KEY,'X-Bin-Meta':false}});
-      if(r.ok){const d=await r.json();projects=Array.isArray(d)?d:(Array.isArray(d.record)?d.record:[]);}
-    }
+    const fresh=await fetchLatest();if(fresh)projects=fresh;
     projects=projects.filter(p=>p.id!==id);
-    await persistProjects();
-    renderGrid(currentFilter);
-  }catch(e){
-    setStatus('Delete failed: '+e.message,'error');
-  }
+    await persistProjects();renderGrid(currentFilter);
+  }catch(e){setStatus('Delete failed: '+e.message,'error');}
   isSaving=false;
 }
 
-/* ── filter buttons ── */
+/* ── upload ── */
 document.querySelectorAll('.filter-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');renderGrid(btn.dataset.filter);
   });
 });
-
-/* ── upload panel ── */
 function toggleUpload(){
   const body=document.getElementById('upload-body'),lbl=document.getElementById('upload-toggle-label');
   lbl.textContent=body.classList.toggle('open')?'▲ collapse':'▼ expand';
@@ -428,15 +453,13 @@ function openUpload(){
   const body=document.getElementById('upload-body');
   if(!body.classList.contains('open')){body.classList.add('open');document.getElementById('upload-toggle-label').textContent='▲ collapse';}
 }
-
 function onFileChange(input){
   const file=input.files[0];if(!file){selectedFile=null;selectedFileB64=null;return;}
-  document.getElementById('file-size-warn').textContent=file.size>300*1024?'⚠ File may be too large — consider linking externally in the description.':'';
+  document.getElementById('file-size-warn').textContent=file.size>300*1024?'⚠ File may be too large.':'';
   selectedFile=file;
   document.getElementById('file-name-display').textContent=file.name+' ('+Math.round(file.size/1024)+' KB)';
   const fr=new FileReader();fr.onload=()=>{selectedFileB64=fr.result.split(',')[1];};fr.readAsDataURL(file);
 }
-
 const dz=document.getElementById('drop-zone');
 dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
 dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
@@ -445,7 +468,7 @@ dz.addEventListener('drop',e=>{
   const f=e.dataTransfer.files[0];if(!f)return;
   selectedFile=f;
   document.getElementById('file-name-display').textContent=f.name+' ('+Math.round(f.size/1024)+' KB)';
-  document.getElementById('file-size-warn').textContent=f.size>300*1024?'⚠ File may be too large for the free tier.':'';
+  document.getElementById('file-size-warn').textContent=f.size>300*1024?'⚠ File may be too large.':'';
   const fr=new FileReader();fr.onload=()=>{selectedFileB64=fr.result.split(',')[1];};fr.readAsDataURL(f);
 });
 
@@ -459,11 +482,7 @@ async function uploadProject(){
   const btn=document.getElementById('submit-btn');
   btn.disabled=true;isSaving=true;setStatus('Saving to the cloud…','loading');
   try{
-    // Always fetch latest before writing to avoid race conditions
-    if(CONFIGURED){
-      const r=await fetch(BIN_URL+'/latest',{headers:{'X-Master-Key':JSONBIN_API_KEY,'X-Bin-Meta':false}});
-      if(r.ok){const d=await r.json();projects=Array.isArray(d)?d:(Array.isArray(d.record)?d.record:[]);}
-    }
+    const fresh=await fetchLatest();if(fresh)projects=fresh;
     const entry={
       id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
       name,type,desc,uploader:currentUser.username,
@@ -483,17 +502,13 @@ async function uploadProject(){
     document.getElementById('file-size-warn').textContent='';
     document.getElementById('up-file').value='';
     selectedFile=null;selectedFileB64=null;
-  }catch(e){
-    projects.shift();
-    setStatus('Error: '+e.message,'error');
-  }
+  }catch(e){projects.shift();setStatus('Error: '+e.message,'error');}
   btn.disabled=false;isSaving=false;
 }
 
-/* ── boot ── */
 loadSession();
 fetchProjects();
-setInterval(fetchProjects,30000); // refresh every 30s
+setInterval(fetchProjects,30000);
 </script>
 </body>
 </html>
